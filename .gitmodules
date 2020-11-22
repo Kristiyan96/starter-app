@@ -1,3 +1,6 @@
 [submodule "bgmentor-back"]
 	path = bgmentor-back
 	url = git@github.com:Kristiyan96/bgmentor-back.git
+[submodule "bgmentor-front"]
+	path = bgmentor-front
+	url = git@github.com:Kristiyan96/bgmentor-front.git
