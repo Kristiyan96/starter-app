@@ -1,0 +1,3 @@
+[submodule "bgmentor-back"]
+	path = bgmentor-back
+	url = git@github.com:Kristiyan96/bgmentor-back.git
