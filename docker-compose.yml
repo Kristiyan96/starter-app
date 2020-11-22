@@ -1,0 +1,61 @@
+version: '3'
+services:
+  database:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: "nfvhsoajm89qm787ryv0647q4q8j3cq89u748qvyn5q675qmc90cuionhuyh9w73cgnw69"
+      POSTGRES_DB: "bgmentor_production"
+      POSTGRES_USER: "deploy"
+    volumes:
+      - ./database:/var/lib/postgresql
+    restart: always
+  api:
+    build:
+      context: bgmentor-back
+      dockerfile: Dockerfile
+    entrypoint: /srv/application/docker-entrypoint.sh
+    command: ["rails", "server", "-b", "0.0.0.0"]
+    links:
+      - database:database
+    environment:
+      - DEVISE_JWT_SECRET_KEY=j5kvbbjbyjb4j5bt45hjbjhvbj4btj4b
+      - RAILS_MASTER_KEY=6bc6a630b2c7f54fcd2ec69f66ae146a
+      - RAILS_ENV=production
+      - POSTGRES_PASSWORD=nfvhsoajm89qm787ryv0647q4q8j3cq89u748qvyn5q675qmc90cuionhuyh9w73cgnw69
+      - POSTGRES_DB=bgmentor_production
+      - POSTGRES_USER=deploy
+      - POSTGRES_HOST=database
+      - EMAIL_PASSWORD=hvitixfbxexfontv
+      - GOOGLE_CLIENT_ID=416415299078-04rm7eih4dufkukuhbfcd3v772ol95a1.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=vMebME2_ketctFa8eTOhxLZt
+      - DOCKERIZED=true
+    depends_on:
+      - database
+    restart: always
+    ports:
+      - "3000:3000"
+  ui:
+    build:
+      context: bgmentor-front
+      dockerfile: Dockerfile
+    links:
+      - api:api
+    restart: always
+  nginx:
+    image: nginx:1.15-alpine
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - ui:ui
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
