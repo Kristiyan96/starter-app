@@ -31,13 +31,15 @@ services:
       - DOCKERIZED=true
     depends_on:
       - database
+      - redis
     restart: always
     ports:
       - "3000:3000"
   redis: 
-    image: redis:alpine
-    ports:
-      - '6379:6379'
+    image: 'redis:6.2-alpine'
+    command: redis-server --requirepass hvitixfbxexfontv
+    volumes:
+      - ./data/redis:/data
   ui:
     build:
       context: bgmentor-front
