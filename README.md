@@ -3,3 +3,7 @@
 2. Pull the repo and 'docker-compose build'
 3. 'sudo ./init_letsencrypt.sh'
 4. docker-compose up --build -d
+
+
+To execute commands in docker container (e.g. drop db) use 
+$ docker exec -it <container-id> bash
